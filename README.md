@@ -38,4 +38,4 @@ Credits
 - PHP library was developed by [Menno Bieringa](http://www.appwards.nl/ "Appwards - Apps for web and mobile")
 
 
-Eat your vegetables.
+Eat your vegetables...
