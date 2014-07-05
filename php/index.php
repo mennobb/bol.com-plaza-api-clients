@@ -60,7 +60,7 @@
 				'TrackAndTraceCode'=>'VLUGWATSNELNUTSJAKKA'
 			),
 			'OrderItems'	=> Array(
-				'id' => Array(12,34,56)
+				'Id' => Array(12,34,56)
 			)
 		);
 		$PlazaAPI->addShipmentToOrderProcessingBatch($Shipment);
@@ -73,7 +73,7 @@
 				'TrackAndTraceCode'=>'1..2...HOPPAKEE'
 			),
 			'OrderItems'	=> Array(
-				'id' => Array(12,34,56)
+				'Id' => Array(12,34,56)
 			)
 		);
 		$PlazaAPI->addShipmentToOrderProcessingBatch($Shipment);
@@ -83,7 +83,7 @@
 			'OrderId'		=> 98765,
 			'ReasonCode'	=> 'OUT_OF_STOCK',
 			'OrderItems'	=> Array(
-				'id' => Array(12,34,56)
+				'Id' => Array(12,34,56)
 			)
 		);
 		$PlazaAPI->addCancellationToOrderProcessingBatch($Cancellation);
