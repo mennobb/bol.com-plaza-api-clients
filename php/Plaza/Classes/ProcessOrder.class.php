@@ -85,8 +85,6 @@
 			
 			$xml .= '</ProcessOrders>';
 
-			echo "\n\n".$xml."\n\n";
-
 			return $xml;
 		}
 	}
