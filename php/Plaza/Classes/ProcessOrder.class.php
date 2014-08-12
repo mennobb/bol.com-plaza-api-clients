@@ -42,20 +42,31 @@
 		}
 		
 		public function addCancellationToOrderProcessingBatch($a) {
-			if (!$a['OrderId'])
+				// The new array newItem is used to make sure the ordering of the fields is correct;
+			$newItem = Array();
+			
+			if (!$a['OrderId']) {
 				throw new \Exception('OrderId is a required field');
+			}
+			$newItem['OrderId'] = $a['OrderId'];
 
-			if (!isset($a['DateTime'])) 
+			if (!isset($a['DateTime'])) {
 				$a['DateTime'] = \Bol\Plaza\API\Tools::getGMTDateTime();
+			}
+			$newItem['DateTime'] = $a['DateTime'];
 			
-			if (!isset($a['ReasonCode']) || !$a['ReasonCode'] || ($a['ReasonCode'] !== 'OUT_OF_STOCK' && $a['ReasonCode'] !== 'REQUESTED_BY_CUSTOMER'))
+			if (!isset($a['ReasonCode']) || !$a['ReasonCode'] || ($a['ReasonCode'] !== 'OUT_OF_STOCK' && $a['ReasonCode'] !== 'REQUESTED_BY_CUSTOMER')) {
 				throw new \Exception('A "ReasonCode" of either "OUT_OF_STOCK" or "REQUESTED_BY_CUSTOMER" is required.');
+			}
+			$newItem['ReasonCode'] = $a['ReasonCode'];
 			
-			if (!isset($a['OrderItems']) || !is_array($a['OrderItems']))
+			if (!isset($a['OrderItems']) || !is_array($a['OrderItems'])) {
 				throw new \Exception('Please provide a numerical array (common array) with OrderItems');
+			}
+			$newItem['OrderItems'] = $a['OrderItems'];
 			
 				// If we made it here everything must be allright (As far as we checked... which isn't very far.).
-			$this->OrderTransaction['Cancellations'][] = $a;
+			$this->OrderTransaction['Cancellations'][] = $newItem;
 		}
 		
 		public function toXml() {

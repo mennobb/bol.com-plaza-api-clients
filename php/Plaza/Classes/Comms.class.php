@@ -41,7 +41,7 @@
 			
 				// Should we target the testing environment?
 			if ($targetTestEnv === true)
-$this->currentEnv = 'testing';
+				$this->currentEnv = 'testing';
 
 		}
 
@@ -88,24 +88,39 @@ $this->currentEnv = 'testing';
 		 * Private Error handler logic
 		 */
 		private function _handleError(&$result, &$headers, &$xmlPayLoad, &$HTTPHeaders) {
-			$xmlError = new \DOMDocument();
-			$xmlError -> loadXML($result);
+				// Fallback error messages
+			$ErrorCode = 'Errorcode unavailable as there was no content received from the server.';
+			$ErrorMsg = 'Errormessage unavailable as there was no content received from the server.';
 			
-			$ErrorCode = $xmlError->getElementsByTagNameNS('http://config.services.com/schemas/bol-messages-1.0.xsd', 'ErrorCode');
-			$ErrorCode = $ErrorCode->item(0)->nodeValue;
+			if (strlen($result)>0) {
+				$xmlError = new \DOMDocument();
+				$xmlError -> loadXML($result);
+				
+				try {
+					$ErrorCode = $xmlError->getElementsByTagNameNS('http://config.services.bol.com/schemas/serviceerror-1.5.xsd', 'errorCode');
+					$ErrorCode = $ErrorCode->item(0)->nodeValue;
+					
+					$ErrorMsg = $xmlError->getElementsByTagNameNS('http://config.services.bol.com/schemas/serviceerror-1.5.xsd', 'errorMessage');
+					$ErrorMsg = $ErrorMsg->item(0)->nodeValue;
+				} catch (Exception $e) {
+					echo 'An error occurred while parsing the XML Error Message. Raw XML printed below<br>';
+				}
+			}
 			
-			$ErrorMsg = $xmlError->getElementsByTagNameNS('http://config.services.com/schemas/bol-messages-1.0.xsd', 'ErrorMessage');
-			$ErrorMsg = $ErrorMsg->item(0)->nodeValue;
-			
+	
 			// @TODO: Dit netjes oplossen. Mooie custom Exception definieren en deze data in stoppen.
-			echo 'XML Payload: "'.$xmlPayLoad."\"\n<br>";
+			echo 'XML Payload: "'.(strlen($xmlPayLoad)>0 ? $xmlPayLoad : 'No XML data received, so there\'s nothing to parse!')."\"\n<br>";
 			echo "<pre>Curl header info:\n";
 			print_r($headers);
 			echo "HTTP Headers:\n";
 			print_r($HTTPHeaders);
 			echo "</pre>";
 			
-			trigger_error($ErrorMsg, E_USER_ERROR);
+			if ($this->debug) {
+				trigger_error($ErrorCode.' - '.$ErrorMsg, E_USER_ERROR);
+			} else {
+				throw new Exception($ErrorCode.' - '.$ErrorMsg);
+			}
 		}
 		
 		
