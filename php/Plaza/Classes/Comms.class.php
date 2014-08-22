@@ -119,7 +119,7 @@
 			if ($this->debug) {
 				trigger_error($ErrorCode.' - '.$ErrorMsg, E_USER_ERROR);
 			} else {
-				throw new Exception($ErrorCode.' - '.$ErrorMsg);
+				throw new \Exception($ErrorCode.' - '.$ErrorMsg);
 			}
 		}
 		
