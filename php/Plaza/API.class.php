@@ -188,8 +188,7 @@
 		 		throw new Exception('Invalid Month "'.$month.'". Minimum value is 1, maximum value is 12');
 		 	}
 
-			if ($month < 10)
-				$month = '0'.$month;
+			$month = str_pad($month, 2, '0', STR_PAD_LEFT);
 			
 			$yearmonth = (string)$year.(string)$month;
 			
