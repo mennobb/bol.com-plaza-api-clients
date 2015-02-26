@@ -31,14 +31,22 @@
 			} else {
 				$newItem['Transporter'] = $a['Transporter'];
 			}
-			
+
 			if (!isset($a['OrderItems']) || !is_array($a['OrderItems'])) {
 				throw new \Exception('Please provide a numerical array (common array) with OrderItems');
 			}
 			$newItem['OrderItems'] = $a['OrderItems'];
 			
+			if (isset($a['DateExpectedDelivery'])) {
+				$newItem['DateExpectedDelivery'] = trim($a['DateExpectedDelivery']);
+				if (preg_match('/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/', $newItem['DateExpectedDelivery']) === 1) {
+					$newItem['DateExpectedDelivery'] = $a['DateExpectedDelivery'];
+				} else {
+					throw new \Exception('Invalid value for the DateExpectedDelivery field. Expected format = YYYY-MM-DD');
+				}
+			}
 				// If we made it here everything must be allright (As far as we checked... which isn't very far.).
-			$this->OrderTransaction['Shipments'][] = $a;
+			$this->OrderTransaction['Shipments'][] = $newItem;
 		}
 		
 		public function addCancellationToOrderProcessingBatch($a) {
@@ -95,7 +103,7 @@
 			}
 			
 			$xml .= '</ProcessOrders>';
-
+die($xml);
 			return $xml;
 		}
 	}

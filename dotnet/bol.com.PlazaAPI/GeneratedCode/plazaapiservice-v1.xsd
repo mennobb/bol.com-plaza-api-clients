@@ -1,0 +1,396 @@
+<xs:schema xmlns:pai="http://plazaapi.bol.com/services/xsd/plazaapiservice-1.0.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://plazaapi.bol.com/services/xsd/plazaapiservice-1.0.xsd" elementFormDefault="qualified">
+  <xs:annotation></xs:annotation>
+  <!--
+ 
+       Data for "process" part of the "orders" service.
+       This service offers functionality for securely and asynchronously shipping and canceling orders, and retrieving the progress of the instruction processing  
+  
+-->
+  <!--
+ POST data for "process": the list of processing instructions to be handled by the "orders" service's "process" part 
+-->
+  <xs:element name="ProcessOrders" type="pai:ProcessOrders"/>
+  <!--
+ Result for POSTing to "process": a ProcessOrderId, to be used as a reference for retrieving the status overview 
+-->
+  <xs:element name="ProcessOrdersResult" type="pai:ProcessOrdersResult"/>
+  <!--
+ Result for GETting of "process/{id}: an overview of the status of the items posted to the "process" part of the "orders" service 
+-->
+  <xs:element name="ProcessOrdersOverview" type="pai:ProcessOrdersOverview"/>
+  <!--
+
+    Data for the "payments  part of the "orders" service.
+    This service offers functionality for securely retrieving all payments for a given month.
+  
+-->
+  <xs:element name="Payments" type="pai:Payments"/>
+  <!--
+
+       Data for the "open orders" part of the "orders" service.
+       This service offers functionality for securely retrieving all open orders for the sending partner.
+  
+-->
+  <!--
+ Result for GETting of "open": An overview of all open orders for the sending partner. 
+-->
+  <xs:element name="OpenOrders" type="pai:OpenOrders"/>
+  <!--  PROCESS ORDERS  -->
+  <!--  POST data  -->
+  <xs:complexType name="ProcessOrders">
+    <xs:all minOccurs="1">
+      <xs:element name="Shipments" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Shipment" maxOccurs="400">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="OrderId" type="pai:LongMax10"/>
+                  <xs:element name="DateTime" type="xs:dateTime"/>
+                  <xs:element name="Transporter" minOccurs="0">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element name="Code" type="pai:StringMin1Max20"/>
+                        <xs:element name="TrackAndTraceCode" minOccurs="0">
+                          <xs:simpleType>
+                            <xs:restriction base="xs:string">
+                              <xs:minLength value="1"/>
+                              <xs:maxLength value="50"/>
+                            </xs:restriction>
+                          </xs:simpleType>
+                        </xs:element>
+                      </xs:sequence>
+                    </xs:complexType>
+                  </xs:element>
+                  <xs:element name="OrderItems" type="pai:OrderItems"/>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="Cancellations" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Cancellation" maxOccurs="100">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="OrderId" type="pai:LongMax10"/>
+                  <xs:element name="DateTime" type="xs:dateTime"/>
+                  <xs:element name="ReasonCode">
+                    <xs:simpleType>
+                      <xs:restriction base="xs:string">
+                        <xs:enumeration value="OUT_OF_STOCK"/>
+                        <xs:enumeration value="REQUESTED_BY_CUSTOMER"/>
+                      </xs:restriction>
+                    </xs:simpleType>
+                  </xs:element>
+                  <xs:element name="OrderItems" type="pai:OrderItems"/>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="OrderItems">
+    <xs:sequence>
+      <xs:element name="Id" type="xs:long" maxOccurs="100"/>
+    </xs:sequence>
+  </xs:complexType>
+  <!--  Response to POST  -->
+  <xs:complexType name="ProcessOrdersResult">
+    <xs:sequence>
+      <xs:element name="ProcessOrderId" type="pai:LongMax15"/>
+    </xs:sequence>
+  </xs:complexType>
+  <!--  Response to GET  -->
+  <xs:complexType name="ProcessOrdersOverview">
+    <xs:annotation>
+      <xs:documentation>
+        Message containing the status of a previous ProcessOrders request.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="ProcessOrderId" type="pai:LongMax15"/>
+      <xs:element name="Status" type="pai:Status"/>
+      <xs:element name="Order" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="OrderId" type="pai:LongMax10"/>
+            <xs:element name="Status" type="pai:Status"/>
+            <xs:element name="DateTime" type="xs:dateTime"/>
+            <xs:element name="OrderItemList">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="OrderItemData" maxOccurs="unbounded">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element name="OrderItemId" type="pai:LongMax10"/>
+                        <xs:element name="Process" type="pai:Process"/>
+                        <xs:element name="Status" type="pai:Status"/>
+                        <xs:element name="ErrorMessage" minOccurs="0">
+                          <xs:simpleType>
+                            <xs:restriction base="xs:string">
+                              <xs:minLength value="1"/>
+                              <xs:maxLength value="256"/>
+                            </xs:restriction>
+                          </xs:simpleType>
+                        </xs:element>
+                      </xs:sequence>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="Status">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="RECEIVED"/>
+      <xs:enumeration value="PENDING"/>
+      <xs:enumeration value="SUCCESS"/>
+      <xs:enumeration value="ERROR"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="Process">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="SHIP"/>
+      <xs:enumeration value="CANCEL"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <!--  Payments  -->
+  <!--  Response to GET  -->
+  <xs:complexType name="Payments">
+    <xs:annotation>
+      <xs:documentation>
+        Message containing the payments of a plaza seller for a given month.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="Payment" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="CreditInvoiceNumber" type="pai:LongMax13"/>
+            <xs:element name="DateTimePayment" type="xs:dateTime"/>
+            <xs:element name="PaymentAmount" type="pai:DecimalTotal9Fraction2"/>
+            <xs:element name="PaymentShipments">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="PaymentShipment" maxOccurs="unbounded">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element name="PackageSlipNumber" type="pai:LongMax10"/>
+                        <xs:element name="OrderId" type="pai:LongMax10"/>
+                        <xs:element name="PaymentShipmentAmount" type="pai:DecimalTotal9Fraction2"/>
+                        <xs:element name="PaymentStatus">
+                          <xs:simpleType>
+                            <xs:restriction base="xs:string">
+                              <xs:enumeration value="FINAL"/>
+                              <xs:enumeration value="CONTINUATION"/>
+                              <xs:enumeration value="GUARANTEE"/>
+                              <xs:enumeration value="BACK_PAYMENT"/>
+                            </xs:restriction>
+                          </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="DateTimeShipment" type="xs:dateTime"/>
+                        <xs:element name="PaymentShipmentItems">
+                          <xs:complexType>
+                            <xs:sequence>
+                              <xs:element name="PaymentShipmentItem" maxOccurs="unbounded">
+                                <xs:complexType>
+                                  <xs:sequence>
+                                    <xs:element name="OrderItemId" type="pai:LongMax10"/>
+                                    <xs:element name="EAN" type="pai:StringMin1Max13"/>
+                                    <xs:element name="ReferenceCode" type="pai:StringMin1Max20" minOccurs="0"/>
+                                    <xs:element name="Quantity" type="pai:LongMax10"/>
+                                    <xs:element name="Price" type="pai:DecimalTotal9Fraction2"/>
+                                    <xs:element name="ShippingContribution" type="pai:DecimalTotal9Fraction2"/>
+                                    <xs:element name="TransactionFee" type="pai:DecimalTotal9Fraction2"/>
+                                    <xs:element name="TotalAmount" type="pai:DecimalTotal9Fraction2"/>
+                                    <xs:element name="ShipmentStatus">
+                                      <xs:simpleType>
+                                        <xs:restriction base="xs:string">
+                                          <xs:enumeration value="NORMAL"/>
+                                          <xs:enumeration value="RETURN"/>
+                                          <xs:enumeration value="LIM">
+                                            <xs:annotation>
+                                              <xs:documentation>Lost In Mail</xs:documentation>
+                                            </xs:annotation>
+                                          </xs:enumeration>
+                                          <xs:enumeration value="RETURNLIM"/>
+                                        </xs:restriction>
+                                      </xs:simpleType>
+                                    </xs:element>
+                                  </xs:sequence>
+                                </xs:complexType>
+                              </xs:element>
+                            </xs:sequence>
+                          </xs:complexType>
+                        </xs:element>
+                      </xs:sequence>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <!--  OPEN ORDERS  -->
+  <!--  Response to GET  -->
+  <xs:complexType name="OpenOrders">
+    <xs:annotation>
+      <xs:documentation>Message containing the open orders of a seller.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="OpenOrder" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="OrderId" type="pai:LongMax10"/>
+            <xs:element name="DateTimeCustomer" type="xs:dateTime"/>
+            <xs:element name="DateTimeDropShipper" type="xs:dateTime"/>
+            <xs:element name="Paid" type="xs:boolean"/>
+            <xs:element name="Buyer">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="ShipmentDetails" type="pai:AddressDetails"/>
+                  <xs:element name="BillingDetails" type="pai:AddressDetails"/>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+            <xs:element name="OpenOrderItems">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="OpenOrderItem" maxOccurs="unbounded">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element name="OrderItemId" type="pai:LongMax10"/>
+                        <xs:element name="EAN">
+                          <xs:simpleType>
+                            <xs:restriction base="xs:string">
+                              <xs:minLength value="1"/>
+                              <xs:maxLength value="13"/>
+                            </xs:restriction>
+                          </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="ReferenceCode" type="pai:StringMin1Max20" minOccurs="0"/>
+                        <xs:element name="Title">
+                          <xs:simpleType>
+                            <xs:restriction base="xs:string">
+                              <xs:minLength value="1"/>
+                              <xs:maxLength value="500"/>
+                            </xs:restriction>
+                          </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="Quantity" type="pai:LongMax10"/>
+                        <xs:element name="Price" type="pai:DecimalTotal9Fraction2"/>
+                        <xs:element name="DeliveryPeriod" type="xs:string"/>
+                        <xs:element name="TransactionFee" type="pai:DecimalTotal9Fraction2"/>
+                      </xs:sequence>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <!--  Address part of the open orders result  -->
+  <xs:complexType name="AddressDetails">
+    <xs:sequence>
+      <xs:element name="SalutationCode">
+        <xs:annotation>
+          <xs:documentation>
+            01: Male, e.g. Heer; 02: Female, e.g. Mevrouw; 03: Unknown, e.g. Heer/Mevrouw
+          </xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:length value="2"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="FirstName" type="pai:StringMin1Max40"/>
+      <xs:element name="Surname" type="pai:StringMin1Max40"/>
+      <xs:element name="Streetname" type="pai:StringMin1Max40"/>
+      <xs:element name="Housenumber" type="pai:LongMax10"/>
+      <xs:element name="HousenumberExtended" type="pai:StringMin1Max20" minOccurs="0"/>
+      <xs:element name="AddressSupplement" type="pai:StringMin1Max40" minOccurs="0"/>
+      <xs:element name="ZipCode" type="pai:StringMin1Max40"/>
+      <xs:element name="City" type="pai:StringMin1Max40"/>
+      <xs:element name="CountryCode">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+            <xs:maxLength value="2"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="Email">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+            <xs:maxLength value="100"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="Telephone" type="pai:StringMin1Max20" minOccurs="0"/>
+      <xs:element name="Company" type="pai:StringMin1Max40" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <!--  ERROR MESSAGE  -->
+  <xs:complexType name="serviceError">
+    <xs:sequence>
+      <xs:element name="errorMessage" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <!--  RESTRICTED TYPES  -->
+  <xs:simpleType name="DecimalTotal9Fraction2">
+    <xs:restriction base="xs:decimal">
+      <xs:totalDigits value="9"/>
+      <xs:fractionDigits value="2"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="StringMin1Max13">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1"/>
+      <xs:maxLength value="13"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="StringMin1Max20">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1"/>
+      <xs:maxLength value="20"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="StringMin1Max40">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1"/>
+      <xs:maxLength value="40"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="LongMax10">
+    <xs:restriction base="xs:long">
+      <xs:maxInclusive value="9999999999"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="LongMax13">
+    <xs:restriction base="xs:long">
+      <xs:maxInclusive value="9999999999999"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="LongMax15">
+    <xs:restriction base="xs:long">
+      <xs:maxInclusive value="999999999999999"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>
