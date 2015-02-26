@@ -24,12 +24,12 @@
 	 */
 	try {
 			// Perform the logical first call: Get the open orders
-//		$openOrders = $PlazaAPI->getOpenOrders();
+		$openOrders = $PlazaAPI->getOpenOrders();
 	} catch (Exception $e) {
 		trigger_error($e, E_USER_ERROR);
 	}
 	// Uncomment om het resultaat als associative array te zien
-//	print_r($openOrders);
+	print_r($openOrders);
 
 
 
