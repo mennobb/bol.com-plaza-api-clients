@@ -1,5 +1,7 @@
 <?php
+
 	namespace Bol\Plaza\API;
+	
 	class Comms {
 			/* API Access key as provided by Bol.com
 			 * The access key is the shorter one of the two keys that you have received
@@ -17,16 +19,21 @@
 				'port' => 443
 			),
 			'production'=>Array(
-				'url' => 'https://plazaapi.bol.com',
+				'url' => 'https://plazaapi.bol.com', // @TODO: Check if not .acc2
 				'port' => 443
 			)
 		);
 		private	$currentEnv = 'production';
 		
+		public $enableResponseHeaders = false;
+		
 		/**
 		 * @param debug {Boolean} Whether or not to print debug information.
 		 */
 		private $debug;
+		
+		
+		private $responseToFile = false;
 		
 		public function __construct($parent, $accessKey, $secretKey, $targetTestEnv) {
 			$this->debug = $parent->debug ? true : false;
@@ -35,32 +42,42 @@
 				$this->accessKey = $accessKey;
 				$this->secretKey = $secretKey;
 			} else {
-				throw new \InvalidArgumentException('Invalid accessKey / secretKey pair provided.');
-				//trigger_error('Invalid accessKey / secretKey pair provided.', E_USER_ERROR); 
+				throw new \Bol\Plaza\PlazaException('Invalid accessKey / secretKey pair provided.');
 			}
 			
 				// Should we target the testing environment?
 			if ($targetTestEnv === true)
 				$this->currentEnv = 'testing';
-
 		}
 
 		/** Public method to perform a call to the API */
 		public function plazaCall($targetUri, $httpMethod = 'POST', $xmlPayLoad = false, $mimeType = 'application/xml') {
-			$response = $this -> _compileAndPerformHTTPCall($targetUri, $httpMethod, $xmlPayLoad, $mimeType);
-			if ($this->debug) \Bol\Plaza\API\Tools::debug($response, true);
-			$xmlObject = new \DOMDocument();
-			$xmlObject -> loadXML($response);
-			return \Bol\Plaza\API\Tools::xmlToArray($xmlObject);
+			
+				// Perform the call
+			$callResult = $this -> _compileAndPerformHTTPCall($targetUri, $httpMethod, $xmlPayLoad, $mimeType);
+			
+				// Print debug info and return 
+			if ($this -> debug) \Bol\Plaza\API\Tools::debug($callResult, true); // @TODO: Checken of dit wel goed werkt.
+
+
+				// Return the entire call result object.
+			return $callResult;
+
 		}
 
 		/**
 		* Compiles the encoded auth header string.
 		*/
-		private function _compileAuthHeader($targetUri, $date, $httpMethod = 'POST', $mimeType = 'application/xml') {
+		private function _compileAuthHeader($targetUri, $date, $httpMethod, $mimeType = 'application/xml') {
 			$httpMethod = strtoupper($httpMethod);
-			if ($httpMethod !== 'POST')
-				$httpMethod = 'GET';
+			
+			if (!in_array($httpMethod, Array('PUT','POST','DELETE','GET', 'HEAD'))) {
+				throw new \Bol\Plaza\PlazaException('Invalid HTTP Method "'.$httpMethod.'"');  
+			}
+			
+			if (strpos($targetUri, '?') !== false) {
+				$targetUri = substr($targetUri, 0, strpos($targetUri, '?'));
+			}
 			
 			$signatureElements = Array();
 			$signatureElements[] = $httpMethod."\n"; // Extra newline
@@ -79,7 +96,7 @@
 								$this->secretKey, 
 								true
 							)
-						);				
+						);
 			return $signature;
 		}
 
@@ -87,40 +104,63 @@
 		/**
 		 * Private Error handler logic
 		 */
-		private function _handleError(&$result, &$headers, &$xmlPayLoad, &$HTTPHeaders) {
+		//private function _handleError(&$result, &$headers, &$xmlPayLoad, &$HTTPHeadersFromRequest) {
+		private function _handleError(&$curlResults, &$HTTPHeadersFromRequest) {
 				// Fallback error messages
-			$ErrorCode = 'Errorcode unavailable as there was no content received from the server.';
-			$ErrorMsg = 'Errormessage unavailable as there was no content received from the server.';
-			
-			if (strlen($result)>0) {
+			$ErrorCode = 'Bol Error Code unavailable';
+			$ErrorMsg = 'Errormessage unavailable';
+
+				// Extract error messages and codes from the server response IF ANY XML was returned at all. 
+			if (strlen(trim($curlResults['payload']))>0) {
 				$xmlError = new \DOMDocument();
-				$xmlError -> loadXML($result);
-				
-				try {
-					$ErrorCode = $xmlError->getElementsByTagNameNS('http://config.services.bol.com/schemas/serviceerror-1.5.xsd', 'errorCode');
-					$ErrorCode = $ErrorCode->item(0)->nodeValue;
+				if (@$xmlError -> loadXML($curlResults['payload']) !== false) {
+					$ErrorCode = @$xmlError->getElementsByTagNameNS('http://config.services.bol.com/schemas/serviceerror-1.5.xsd', 'errorCode');
+					$ErrorCode = @$ErrorCode->item(0)->nodeValue;
 					
-					$ErrorMsg = $xmlError->getElementsByTagNameNS('http://config.services.bol.com/schemas/serviceerror-1.5.xsd', 'errorMessage');
-					$ErrorMsg = $ErrorMsg->item(0)->nodeValue;
-				} catch (Exception $e) {
-					echo 'An error occurred while parsing the XML Error Message. Raw XML printed below<br>';
+					$ErrorMsg = @$xmlError->getElementsByTagNameNS('http://config.services.bol.com/schemas/serviceerror-1.5.xsd', 'errorMessage');
+					$ErrorMsg = @$ErrorMsg->item(0)->nodeValue;				
 				}
 			}
 			
-	
-			// @TODO: Dit netjes oplossen. Mooie custom Exception definieren en deze data in stoppen.
-			echo 'XML Payload: "'.(strlen($xmlPayLoad)>0 ? $xmlPayLoad : 'No XML data received, so there\'s nothing to parse!')."\"\n<br>";
-			echo "<pre>Curl header info:\n";
-			print_r($headers);
-			echo "HTTP Headers:\n";
-			print_r($HTTPHeaders);
-			echo "</pre>";
-			
-			if ($this->debug) {
-				trigger_error($ErrorCode.' - '.$ErrorMsg, E_USER_ERROR);
-			} else {
-				throw new \Exception($ErrorCode.' - '.$ErrorMsg);
+			if (isset($curlResults['status']['http_code'])) {
+				$ErrorHTTPCode = 'HTTP1/1 '.$curlResults['status']['http_code'];
+				
+				switch ($curlResults['status']['http_code']) {
+					case '401':
+						$ErrorMsg = 'Unauthorized';
+					break;
+					case '403':
+						$ErrorMsg = 'Forbidden';
+					break;
+					case '404':
+						$ErrorMsg = 'Not Found';
+					break;
+					case '409':
+						$ErrorMsg = 'Rate limiting in effect';
+					break;
+				}
 			}
+
+
+			if ($this->debug) {
+				echo '<pre>';
+				echo 'XML sent to server: '.(strlen($curlResults['payLoad'])>0 ? ('"'.htmlentities($curlResults['payLoad']).'"') : 'None')."\n\n";
+				echo "Curl Status Info:\n";
+				print_r($curlResults['status']);
+				echo "\n\nHTTP Headers:\n";
+				print_r($HTTPHeadersFromRequest);
+				echo "</pre>";
+			}
+
+			$Exception = new \Bol\Plaza\PlazaException(
+				'An error occured while communicating with the server. See the getHTTPClientStatus(), getRawBody() and getHTTPError() methods on the Exception for more details.',
+				null,
+				null
+			);
+			$Exception -> setHTTPClientStatus($curlResults['status']);
+			$Exception -> setRawBody($curlResults['payload']);
+			$Exception -> setHTTPError($curlResults['error']);
+			throw $Exception;
 		}
 		
 		
@@ -130,6 +170,8 @@
 		 * @param $httpMethod - GET or POST 
 		 * @param $xmlPayLoad - String containing the XML to be sent. 
 		 * @param $mimeType - Typically application/xml;
+		 * 
+		 * @return Array with 3 keys: playload, status and error
 		 * 
 		 * @Throws Exception 
 		 */
@@ -147,19 +189,39 @@
 			
 			$HTTPHeaders = Array(
 				"Content-type: ".$mimeType, 
-				"X-BOL-Date:".$date, 
+				"X-BOL-Date: ".$date, 
 				"X-BOL-Authorization: ".$headerXBolAuth
 			);
-			
+
+			//print_r($HTTPHeaders);
+			//die();
 				// Setup Curl
 			$curl = curl_init();
 			curl_setopt($curl, CURLOPT_HTTPHEADER, $HTTPHeaders);
+			curl_setopt($curl, CURLOPT_HEADER, $this->enableResponseHeaders);
 			curl_setopt($curl, CURLOPT_URL, $this->environments[$this->currentEnv]['url'] . $targetUri);
 			curl_setopt($curl, CURLOPT_PORT, $this->environments[$this->currentEnv]['port']);
 			curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+			curl_setopt($curl, CURLOPT_FOLLOWLOCATION, false);
 			if ($httpMethod == 'POST') {
 				curl_setopt($curl, CURLOPT_POST, true);
 				curl_setopt($curl, CURLOPT_POSTFIELDS, $xmlPayLoad);
+			} else if ($httpMethod == 'PUT') {
+				curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'PUT');
+				curl_setopt($curl, CURLOPT_POSTFIELDS, $xmlPayLoad);
+			} else if ($httpMethod == 'DELETE') {
+				curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'DELETE');
+			} else if ($httpMethod == 'HEAD') {
+				curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'HEAD');
+			}
+
+			if ($this->responseToFile !== false) {
+				if (file_exists(dirname($this->responseToFile)) && is_writable(dirname($this->responseToFile))) {
+					$fp = fopen($this->responseToFile, 'w');
+					curl_setopt($curl, CURLOPT_FILE, $fp);
+				} else {
+					throw new \Bol\Plaza\PlazaException('Unable to open location "'.$this->responseToFile.'" for writing');
+				}
 			}
 			
 			/*
@@ -169,36 +231,48 @@
 			 curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
 			 curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
 			 
-			if(curl_errno($curl)) {
-				throw new \Exception((string)curl_errno($curl));
-				return;
-			}
-			
 				// Execute the call
-			$curlResult = curl_exec($curl);
+			$curlPayload = curl_exec($curl);
 			$curlStatus = curl_getinfo($curl);
-			
-				// if $result is false then there was an error. We know this because CURLOPT_RETURNTRANSFER = true.
-			if ($curlResult === false) {
-				throw new \Exception((string)curl_error($curl));
-				return; // superfluous.
-			}
-			
+			$curlError = curl_error($curl);
+
 				// Clean up after ourselves
 			curl_close($curl);
+
+				// Disable the "write to file" option.
+			$this->responseToFile(false);
+			
+			
+			$curlResults = array(
+				'payload'	=>$curlPayload,	// Contains the HTTP Body 
+				'status'	=>$curlStatus,	// Contains the curl status
+				'error'		=>$curlError	// Contains cURL's error message (if any)
+			);
 			
 				// Handle the response
-			if ($curlStatus['http_code'] !== 200 || !strstr($curlStatus['content_type'], 'application/xml')) {
-					// If the server returned an error, fail screaming like a pig....yet graceful.
-					// @TODO: This is not ideal as it can't be controlled. This hsould be rewritten to become something optional or something...
-				$this->_handleError($curlResult, $curlStatus, $xmlPayLoad, $HTTPHeaders);
+			if (!$curlStatus['http_code'] || $curlStatus['http_code'] < 200 || $curlStatus['http_code'] > 299) {
+					// If the server returned an error, fail screaming like a pig....yet in a graceful manner ;)
+					// @TODO: This is not ideal as it can't be controlled. This should be rewritten to become something optional or something...
+				$this->_handleError($curlResults, $HTTPHeaders);
 			} else {
-					// Parse the response and return a simpleXml object
-				if (strstr($curlStatus['content_type'], 'application/xml')) 
-					return $curlResult;
-				else
-					throw new \Exception('Content of type application/xml expected. Received "'.$curlStatus['content_type'].'" instead.');
+					// Return the results to the caller.
+				return $curlResults;
 			}
+		}
+
+		/**
+		 * Configures the HTTP client to store the HTTP response to disk. 
+		 * After executing the call and storing it, this setting will be disabled again automatically!
+		 * @param $fileName String specifying the complete path to the file that should be saved or false to disable this feature
+		 */
+		public function responseToFile($fileName) {
+			if ($fileName === false) {
+				$this->responseToFile = false;
+			} else if (!file_exists(dirname($fileName)) || !is_writable(dirname($fileName))) {
+				throw new \Bol\Plaza\PlazaException('Unable to open location "'.$fileName.'" for writing');
+			}
+			
+			$this->responseToFile = $fileName;
 		}
 	}
 ?>

@@ -2,19 +2,18 @@ bol.com-plaza-api-clients
 =========================
 
 A suite of client classes for the bol.com Plaza API in PHP and C#
-Currently ONLY the PHP class is available.
 
 
 Bol.com Plaza API Features
 ==========================
-The bol.com Plaza API is one of the API's that bol.com has to offer. It allows 3rd party sellers with professional bol.com seller accounts to link their order administration to that of bol.com.
+The bol.com Plaza API allows 3rd party sellers with professional bol.com seller accounts to link their order administration to that of bol.com.
 
 Currently the only features disclosed through the API are:
 - Receiving new orders
 - Marking orders as shipped or cancelled
 - Getting payment information
 
-For more information see the bol.com [developer portal](http://dev-local.developers.bol.com/ "Developer Portal") (Only available in the Dutch language although the documentation is in English).
+For more information see the bol.com [developer portal](https://developers.bol.com/ "Developer Portal") (Only available in the Dutch language although the documentation is in English).
 
 Target Audience
 ===============
@@ -36,6 +35,7 @@ The developer knows how to code for his own systems and wishes to connect those 
 Credits
 =======
 - PHP library was developed by [Menno Bieringa](http://www.appwards.nl/ "Appwards - Apps for web and mobile")
+- The C# .NET client was developer by [Carolina Bauque](http://www.carobauque.com/)
 
 
 Eat your vegetables...

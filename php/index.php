@@ -61,8 +61,7 @@
 			),
 			'OrderItems'	=> Array(
 				'Id' => Array(12,34,56)
-			),
-			'DateExpectedDelivery' => '2015-06-15'
+			)
 		);
 		$PlazaAPI->addShipmentToOrderProcessingBatch($Shipment);
 		
@@ -75,8 +74,7 @@
 			),
 			'OrderItems'	=> Array(
 				'Id' => Array(12,34,56)
-			),
-			'DateExpectedDelivery' => '2015-12-31'
+			)
 		);
 		$PlazaAPI->addShipmentToOrderProcessingBatch($Shipment);
 		
