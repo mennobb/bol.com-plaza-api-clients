@@ -1,8 +1,11 @@
 <?php
 
-	namespace Bol\Plaza;
+	namespace Bol\Plaza\API\Models;
+	
+	use Bol\Plaza\API\Exceptions\PlazaException;
 	
 	class OfferUpdate {
+		
 		protected $OfferId;
 		protected $Price;
 		protected $DeliveryCode;

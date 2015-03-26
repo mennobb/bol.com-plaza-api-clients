@@ -1,8 +1,9 @@
 <?php
 
-	namespace Bol\Plaza;
+	namespace Bol\Plaza\API\Models;
 	
 	class StockUpdate {
+		
 		protected $OfferId;
 		protected $QuantityInStock;
 		

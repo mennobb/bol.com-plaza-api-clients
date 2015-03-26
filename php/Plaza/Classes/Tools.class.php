@@ -1,6 +1,6 @@
 <?php
 
-	namespace Bol\Plaza\API;
+	namespace Bol\Plaza\API\Classes;
 	
 	class Tools {
 

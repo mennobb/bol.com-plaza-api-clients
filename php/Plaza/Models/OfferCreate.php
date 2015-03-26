@@ -1,8 +1,11 @@
 <?php
 
-	namespace Bol\Plaza;
+	namespace Bol\Plaza\API\Models;
+	
+	use Bol\Plaza\API\Exceptions\PlazaException;
 	
 	class OfferCreate extends OfferUpdate {
+		
 		protected $EAN;
 		protected $Condition;
 		protected $QuantityInStock;
@@ -17,7 +20,7 @@
 			parent::__construct($offer);
 			
 			if (!isset($offer['EAN']) || !isset($offer['Condition'])) {
-				throw new \Bol\Plaza\PlazaException('Invalid input instantiating new offer create model');
+				throw new PlazaException('Invalid input instantiating new offer create model');
 			}
 			$this->SetEAN($offer['EAN']);
 			$this->SetCondition($offer['Condition']);
