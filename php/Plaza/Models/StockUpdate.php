@@ -1,6 +1,6 @@
 <?php
 
-	namespace Bol\Plaza\API\Models;
+	namespace Bol\Plaza\Models;
 	
 	class StockUpdate {
 		

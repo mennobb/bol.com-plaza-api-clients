@@ -5,7 +5,9 @@
     "description": "Bol Plaza Api Clients",
 	"keywords": ["bol","api","plaza","clients","composer"],
     "autoload": {
-        "psr-0": { "": "src/" }
+        "psr-4": {
+            "Bol\\Plaza\\": "php/Plaza/"
+        }
     },
     "require": {
         "php": ">=5.3.3"

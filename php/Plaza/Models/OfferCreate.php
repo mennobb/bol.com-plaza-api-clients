@@ -1,8 +1,8 @@
 <?php
 
-	namespace Bol\Plaza\API\Models;
+	namespace Bol\Plaza\Models;
 	
-	use Bol\Plaza\API\Exceptions\PlazaException;
+	use Bol\Plaza\Exceptions\PlazaException;
 	
 	class OfferCreate extends OfferUpdate {
 		

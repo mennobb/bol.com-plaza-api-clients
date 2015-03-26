@@ -1,9 +1,9 @@
 <?php
 
-	namespace Bol\Plaza\API\Classes;
+	namespace Bol\Plaza\Classes;
 	
-	use Bol\Plaza\API\Exceptions\PlazaException;
-	use Bol\Plaza\API\Classes\Tools;
+	use Bol\Plaza\Exceptions\PlazaException;
+	use Bol\Plaza\Classes\Tools;
 	
 	class Comms {
 			/* API Access key as provided by Bol.com

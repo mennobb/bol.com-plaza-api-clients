@@ -1,13 +1,13 @@
 <?php	
-	namespace Bol\Plaza\API;
+	namespace Bol\Plaza;
 	
-	use Bol\Plaza\API\Exceptions\PlazaException;
-	use Bol\Plaza\API\Classes\Comms;
-	use Bol\Plaza\API\Classes\ProcessOrder;
-	use Bol\Plaza\API\Classes\Tools;
-	use Bol\Plaza\API\Models\OfferUpdate;
-	use Bol\Plaza\API\Models\StockUpdate;
-	use Bol\Plaza\API\Models\OfferCreate;
+	use Bol\Plaza\Exceptions\PlazaException;
+	use Bol\Plaza\Classes\Comms;
+	use Bol\Plaza\Classes\ProcessOrder;
+	use Bol\Plaza\Classes\Tools;
+	use Bol\Plaza\Models\OfferUpdate;
+	use Bol\Plaza\Models\StockUpdate;
+	use Bol\Plaza\Models\OfferCreate;
 	
 	/**
 	 * * To make the code as lightweight as possible we use as little classes as possible.
@@ -56,7 +56,7 @@
 		/**
 		 * Create an offer on the server. The OfferID must be unique although no error will be thrown by the API when it turns out to be a duplicate as the process is asynchronous on bol.com's end.
 		 * The getOffers() method will provide details regarding your failed "offer creates"
-		 * @param $offer must be of type Bol\Plaza\API\Models\OfferCreate
+		 * @param $offer must be of type Bol\Plaza\Models\OfferCreate
 		 */
 		public function createOffer($offer) {
 				// Type checking
@@ -81,14 +81,14 @@
 					throw $Exception;
 				}
 			} else {
-				throw new PlazaException('createOffer was called without a valid offer of type Bol\Plaza\API\Models\OfferCreate');
+				throw new PlazaException('createOffer was called without a valid offer of type Bol\Plaza\Models\OfferCreate');
 			}
 		}
 		
 		/**
 		 * Update an offer on the server. The OfferID must exist within your offers already, although no error will be thrown by the API when it turns out to be a duplicate as the process is asynchronous on bol.com's end.
 		 * The getOffers() method will provide input regarding your failed "offer updates".
-		 * @param $offer must be of type Bol\Plaza\API\Models\OfferUpdate
+		 * @param $offer must be of type Bol\Plaza\Models\OfferUpdate
 		 */
 		public function updateOffer($offer) {
 				// Type checking
@@ -114,7 +114,7 @@
 					throw $Exception;
 				}
 			} else {
-				throw new PlazaException('updateOffer was called without a valid offer. Expected type Bol\Plaza\API\Models\OfferUpdate');
+				throw new PlazaException('updateOffer was called without a valid offer. Expected type Bol\Plaza\Models\OfferUpdate');
 			}
 		}
 		
@@ -122,7 +122,7 @@
 		/**
 		 * Update an offer on the server. The OfferID must exist within your offers already, although no error will be thrown by the API when it turns out to be a duplicate as the process is asynchronous on bol.com's end.
 		 * The getOffers() method will provide input regarding your failed "offer updates".
-		 * @param $offer must be of type Bol\Plaza\API\Models\OfferUpdate
+		 * @param $offer must be of type Bol\Plaza\Models\OfferUpdate
 		 */
 		public function updateOfferStock($offer) {
 				// Type checking
@@ -148,7 +148,7 @@
 					throw $Exception;
 				}
 			} else {
-				throw new PlazaException('updateOffer was called without a valid offer. Expected type Bol\Plaza\API\Models\OfferUpdate');
+				throw new PlazaException('updateOffer was called without a valid offer. Expected type Bol\Plaza\Models\OfferUpdate');
 			}
 		}
 		

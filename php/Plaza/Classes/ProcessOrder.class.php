@@ -1,7 +1,7 @@
 <?php
-	namespace Bol\Plaza\API\Classes;
+	namespace Bol\Plaza\Classes;
 	
-	use Bol\Plaza\API\Classes\Tools;
+	use Bol\Plaza\Classes\Tools;
 	
 	class ProcessOrder {
 		private $OrderTransaction;
