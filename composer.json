@@ -1,0 +1,13 @@
+{
+    "name": "mennobb/bolapi",
+    "license": "MIT",
+    "type": "library",
+    "description": "Bol Plaza Api Clients",
+	"keywords": ["bol","api","plaza","clients","composer"],
+    "autoload": {
+        "psr-0": { "": "src/" }
+    },
+    "require": {
+        "php": ">=5.3.3"
+    }
+}
