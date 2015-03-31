@@ -60,7 +60,7 @@
 		 */
 		public function createOffer($offer) {
 				// Type checking
-			if (is_a($offer, 'OfferCreate')) {
+			if (is_a($offer, 'Bol\Plaza\Models\BolOfferCreate')) {
 				$result = $this->Comms->plazaCall(
 					'/offers/v1/'.urlencode($offer->__get('OfferId')),
 					'POST', 
@@ -93,7 +93,7 @@
 		public function updateOffer($offer) {
 				// Type checking
 			
-			if (is_a($offer, 'OfferUpdate')) {
+			if (is_a($offer, 'Bol\Plaza\Models\OfferUpdate')) {
 				$result = $this->Comms->plazaCall(
 					'/offers/v1/'.urlencode($offer->__get('OfferId')),
 					'PUT',
@@ -127,7 +127,7 @@
 		public function updateOfferStock($offer) {
 				// Type checking
 			
-			if (is_a($offer, 'StockUpdate')) {
+			if (is_a($offer, 'Bol\Plaza\Models\StockUpdate')) {
 				$result = $this->Comms->plazaCall(
 					'/offers/v1/'.urlencode($offer->__get('OfferId')).'/stock',
 					'PUT',
