@@ -2,6 +2,10 @@
 	
 	namespace Bol\Plaza;
 	
+	use Bol\Plaza\Classes\Comms;
+	use Bol\Plaza\Classes\Tools;
+	use Bol\Plaza\Classes\ProcessOrder;
+	
 	/**
 	 * * To make the code as lightweight as possible we use as little classes as possible.
 	 */
@@ -42,11 +46,8 @@
 			
 			$this->debug = $debug ? true : false; 
 			
-				// Include the communication class.
-			require_once dirname(__FILE__).'/Classes/Comms.class.php';
-			$this -> Comms = new \Bol\Plaza\API\Comms($this, $accessKey, $secretKey, $targetTestEnv);
+			$this -> Comms = new Comms($this, $accessKey, $secretKey, $targetTestEnv);
 			
-			require_once dirname(__FILE__).'/Classes/Tools.class.php';
 			//$this -> Tools = new PlazaAPITools();
 		}
 		
@@ -67,8 +68,7 @@
 		 * A single batch can hold up to 100 notifications.
 		 */
 		public function createNewOrderProcessingBatch() {
-			require_once dirname(__FILE__).'/Classes/ProcessOrder.class.php';
-			$this->OrderTransaction = new \Bol\Plaza\API\ProcessOrder();
+			$this->OrderTransaction = new ProcessOrder();
 			$this->OrderTransactionSize = 0;
 		}
 		

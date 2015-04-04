@@ -1,6 +1,11 @@
 <?php
-	namespace Bol\Plaza\API;
+
+	namespace Bol\Plaza\Classes;
+	
+	use Bol\Plaza\Classes\Tools;
+	
 	class ProcessOrder {
+		
 		private $OrderTransaction;
 		
 		public function __construct() {
@@ -20,7 +25,7 @@
 			$newItem['OrderId'] = $a['OrderId'];
 				
 			if (!isset($a['DateTime'])) {
-				$a['DateTime'] = \Bol\Plaza\API\Tools::getGMTDateTime();
+				$a['DateTime'] = Tools::getGMTDateTime();
 			}			
 			$newItem['DateTime'] = $a['DateTime'];
 
@@ -59,7 +64,7 @@
 			$newItem['OrderId'] = $a['OrderId'];
 
 			if (!isset($a['DateTime'])) {
-				$a['DateTime'] = \Bol\Plaza\API\Tools::getGMTDateTime();
+				$a['DateTime'] = Tools::getGMTDateTime();
 			}
 			$newItem['DateTime'] = $a['DateTime'];
 			
@@ -85,7 +90,7 @@
 				$xml .= "	<Shipments>\n";
 				foreach ($this->OrderTransaction['Shipments'] as $shipment) {
 					$xml .= "		<Shipment>\n";
-					$xml .= \Bol\Plaza\API\Tools::arrayToXML($shipment, 3);
+					$xml .= Tools::arrayToXML($shipment, 3);
 					$xml .= "		</Shipment>\n";
 				}
 				$xml .= "	</Shipments>\n";
@@ -96,7 +101,7 @@
 				$xml .= "	<Cancellations>\n";
 				foreach ($this->OrderTransaction['Cancellations'] as $cancellation) {
 					$xml .= "		<Cancellation>\n";
-					$xml .= \Bol\Plaza\API\Tools::arrayToXML($cancellation, 3);
+					$xml .= Tools::arrayToXML($cancellation, 3);
 					$xml .= "		</Cancellation>\n";
 				}
 				$xml .= "	</Cancellations>\n";
