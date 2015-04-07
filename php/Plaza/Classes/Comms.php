@@ -1,6 +1,11 @@
 <?php
-	namespace Bol\Plaza\API;
+
+	namespace Bol\Plaza\Classes;
+	
+	use Bol\Plaza\Classes\Tools;
+	
 	class Comms {
+		
 			/* API Access key as provided by Bol.com
 			 * The access key is the shorter one of the two keys that you have received
 			 */
@@ -47,11 +52,11 @@
 
 		/** Public method to perform a call to the API */
 		public function plazaCall($targetUri, $httpMethod = 'POST', $xmlPayLoad = false, $mimeType = 'application/xml') {
-			$response = $this -> _compileAndPerformHTTPCall($targetUri, $httpMethod, $xmlPayLoad, $mimeType);
-			if ($this->debug) \Bol\Plaza\API\Tools::debug($response, true);
+			$response = $this->_compileAndPerformHTTPCall($targetUri, $httpMethod, $xmlPayLoad, $mimeType);
+			if ($this->debug) Tools::debug($response, true);
 			$xmlObject = new \DOMDocument();
-			$xmlObject -> loadXML($response);
-			return \Bol\Plaza\API\Tools::xmlToArray($xmlObject);
+			$xmlObject->loadXML($response);
+			return Tools::xmlToArray($xmlObject);
 		}
 
 		/**

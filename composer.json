@@ -1,0 +1,15 @@
+{
+    "name": "appwards/bol-plaza-api-sdk",
+    "license": "MIT",
+    "type": "library",
+    "description": "Bol Plaza Api Clients",
+	"keywords": ["bol","api","plaza","clients","composer","appwards"],
+    "autoload": {
+        "psr-4": {
+            "Bol\\Plaza\\": "php/Plaza/"
+        }
+    },
+    "require": {
+        "php": ">=5.3.3"
+    }
+}
