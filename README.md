@@ -2,7 +2,6 @@ bol.com-plaza-api-clients
 =========================
 
 A suite of client classes for the bol.com Plaza API in PHP and C#
-Currently ONLY the PHP class is available.
 
 
 Bol.com Plaza API Features
@@ -36,6 +35,7 @@ The developer knows how to code for his own systems and wishes to connect those 
 Credits
 =======
 - PHP library was developed by [Menno Bieringa](http://www.appwards.nl/ "Appwards - Apps for web and mobile")
+- C# library was developed by [Carolina Bauque](http://www.carobauque.com/)
 
 
 Eat your vegetables...
