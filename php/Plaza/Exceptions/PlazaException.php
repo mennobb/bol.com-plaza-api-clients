@@ -1,6 +1,6 @@
 <?php
 
-namespace Bol\Plaza;
+namespace Bol\Plaza\Exceptions;
 
 class PlazaException extends \Exception {
 	

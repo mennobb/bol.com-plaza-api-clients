@@ -1,6 +1,9 @@
 <?php
 
-	namespace Bol\Plaza\API;
+	namespace Bol\Plaza\Classes;
+	
+	use Bol\Plaza\Exceptions\PlazaException;
+	use Bol\Plaza\Classes\Tools;
 	
 	class Comms {
 			/* API Access key as provided by Bol.com
@@ -42,7 +45,7 @@
 				$this->accessKey = $accessKey;
 				$this->secretKey = $secretKey;
 			} else {
-				throw new \Bol\Plaza\PlazaException('Invalid accessKey / secretKey pair provided.');
+				throw new PlazaException('Invalid accessKey / secretKey pair provided.');
 			}
 			
 				// Should we target the testing environment?
@@ -57,7 +60,7 @@
 			$callResult = $this -> _compileAndPerformHTTPCall($targetUri, $httpMethod, $xmlPayLoad, $mimeType);
 			
 				// Print debug info and return 
-			if ($this -> debug) \Bol\Plaza\API\Tools::debug($callResult, true); // @TODO: Checken of dit wel goed werkt.
+			if ($this -> debug) Tools::debug($callResult, true); // @TODO: Checken of dit wel goed werkt.
 
 
 				// Return the entire call result object.
@@ -72,7 +75,7 @@
 			$httpMethod = strtoupper($httpMethod);
 			
 			if (!in_array($httpMethod, Array('PUT','POST','DELETE','GET', 'HEAD'))) {
-				throw new \Bol\Plaza\PlazaException('Invalid HTTP Method "'.$httpMethod.'"');  
+				throw new PlazaException('Invalid HTTP Method "'.$httpMethod.'"');  
 			}
 			
 			if (strpos($targetUri, '?') !== false) {
@@ -152,7 +155,7 @@
 				echo "</pre>";
 			}
 
-			$Exception = new \Bol\Plaza\PlazaException(
+			$Exception = new PlazaException(
 				'An error occured while communicating with the server. See the getHTTPClientStatus(), getRawBody() and getHTTPError() methods on the Exception for more details.',
 				null,
 				null
@@ -220,7 +223,7 @@
 					$fp = fopen($this->responseToFile, 'w');
 					curl_setopt($curl, CURLOPT_FILE, $fp);
 				} else {
-					throw new \Bol\Plaza\PlazaException('Unable to open location "'.$this->responseToFile.'" for writing');
+					throw new PlazaException('Unable to open location "'.$this->responseToFile.'" for writing');
 				}
 			}
 			
@@ -269,7 +272,7 @@
 			if ($fileName === false) {
 				$this->responseToFile = false;
 			} else if (!file_exists(dirname($fileName)) || !is_writable(dirname($fileName))) {
-				throw new \Bol\Plaza\PlazaException('Unable to open location "'.$fileName.'" for writing');
+				throw new PlazaException('Unable to open location "'.$fileName.'" for writing');
 			}
 			
 			$this->responseToFile = $fileName;

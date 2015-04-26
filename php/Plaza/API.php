@@ -1,6 +1,13 @@
-<?php
-	
+<?php	
 	namespace Bol\Plaza;
+	
+	use Bol\Plaza\Exceptions\PlazaException;
+	use Bol\Plaza\Classes\Comms;
+	use Bol\Plaza\Classes\ProcessOrder;
+	use Bol\Plaza\Classes\Tools;
+	use Bol\Plaza\Models\OfferUpdate;
+	use Bol\Plaza\Models\StockUpdate;
+	use Bol\Plaza\Models\OfferCreate;
 	
 	/**
 	 * * To make the code as lightweight as possible we use as little classes as possible.
@@ -43,26 +50,17 @@
 			 */
 		public function __construct($accessKey, $secretKey, $targetTestEnv=false, $debug=false) {
 			$this->debug = $debug ? true : false; 
-			
-				// Include the communication class.
-			require_once dirname(__FILE__).'/Classes/Comms.class.php';
-			$this -> Comms = new \Bol\Plaza\API\Comms($this, $accessKey, $secretKey, $targetTestEnv);
-			
-			require_once dirname(__FILE__).'/Exceptions/PlazaException.class.php';
-			require_once dirname(__FILE__).'/Classes/Tools.class.php';
-			require_once dirname(__FILE__).'/Models/OfferUpdate.php';
-			require_once dirname(__FILE__).'/Models/StockUpdate.php';
-			require_once dirname(__FILE__).'/Models/OfferCreate.php';
+			$this -> Comms = new Comms($this, $accessKey, $secretKey, $targetTestEnv);
 		}
 
 		/**
 		 * Create an offer on the server. The OfferID must be unique although no error will be thrown by the API when it turns out to be a duplicate as the process is asynchronous on bol.com's end.
 		 * The getOffers() method will provide details regarding your failed "offer creates"
-		 * @param $offer must be of type \Bol\Plaza\OfferCreate
+		 * @param $offer must be of type Bol\Plaza\Models\OfferCreate
 		 */
 		public function createOffer($offer) {
 				// Type checking
-			if (is_a($offer, 'Bol\Plaza\OfferCreate')) {
+			if (is_a($offer, 'Bol\Plaza\Models\BolOfferCreate')) {
 				$result = $this->Comms->plazaCall(
 					'/offers/v1/'.urlencode($offer->__get('OfferId')),
 					'POST', 
@@ -72,7 +70,7 @@
 				if ($result['status']['http_code'] >= 200 && $result['status']['http_code'] < 300) {
 					return true;
 				} else {
-					$Exception = new \Bol\Plaza\PlazaException(
+					$Exception = new PlazaException(
 						'An error occured while creating your offer. See the getHTTPClientStatus(), getRawBody() and getHTTPError() methods on the Exception for more details.',
 						null,
 						null
@@ -83,19 +81,19 @@
 					throw $Exception;
 				}
 			} else {
-				throw new \Bol\Plaza\PlazaException('createOffer was called without a valid offer of type Bol\Plaza\OfferCreate');
+				throw new PlazaException('createOffer was called without a valid offer of type Bol\Plaza\Models\OfferCreate');
 			}
 		}
 		
 		/**
 		 * Update an offer on the server. The OfferID must exist within your offers already, although no error will be thrown by the API when it turns out to be a duplicate as the process is asynchronous on bol.com's end.
 		 * The getOffers() method will provide input regarding your failed "offer updates".
-		 * @param $offer must be of type \Bol\Plaza\OfferUpdate
+		 * @param $offer must be of type Bol\Plaza\Models\OfferUpdate
 		 */
 		public function updateOffer($offer) {
 				// Type checking
 			
-			if (is_a($offer, 'Bol\\Plaza\\OfferUpdate')) {
+			if (is_a($offer, 'Bol\Plaza\Models\OfferUpdate')) {
 				$result = $this->Comms->plazaCall(
 					'/offers/v1/'.urlencode($offer->__get('OfferId')),
 					'PUT',
@@ -105,7 +103,7 @@
 				if ($result['status']['http_code'] >= 200 && $result['status']['http_code'] < 300) {
 					return true;
 				} else {
-					$Exception = new \Bol\Plaza\PlazaException(
+					$Exception = new PlazaException(
 						'An error occured while updating your offer. See the getHTTPClientStatus(), getRawBody() and getHTTPError() methods on the Exception for more details.',
 						null,
 						null
@@ -116,7 +114,7 @@
 					throw $Exception;
 				}
 			} else {
-				throw new \Bol\Plaza\PlazaException('updateOffer was called without a valid offer. Expected type \Bol\Plaza\OfferUpdate');
+				throw new PlazaException('updateOffer was called without a valid offer. Expected type Bol\Plaza\Models\OfferUpdate');
 			}
 		}
 		
@@ -124,12 +122,12 @@
 		/**
 		 * Update an offer on the server. The OfferID must exist within your offers already, although no error will be thrown by the API when it turns out to be a duplicate as the process is asynchronous on bol.com's end.
 		 * The getOffers() method will provide input regarding your failed "offer updates".
-		 * @param $offer must be of type \Bol\Plaza\OfferUpdate
+		 * @param $offer must be of type Bol\Plaza\Models\OfferUpdate
 		 */
 		public function updateOfferStock($offer) {
 				// Type checking
 			
-			if (is_a($offer, 'Bol\\Plaza\\StockUpdate')) {
+			if (is_a($offer, 'Bol\Plaza\Models\StockUpdate')) {
 				$result = $this->Comms->plazaCall(
 					'/offers/v1/'.urlencode($offer->__get('OfferId')).'/stock',
 					'PUT',
@@ -139,7 +137,7 @@
 				if ($result['status']['http_code'] >= 200 && $result['status']['http_code'] < 300) {
 					return true;
 				} else {
-					$Exception = new \Bol\Plaza\PlazaException(
+					$Exception = new PlazaException(
 						'An error occured while updating your offer\'s stock. See the getHTTPClientStatus(), getRawBody() and getHTTPError() methods on the Exception for more details.',
 						null,
 						null
@@ -150,7 +148,7 @@
 					throw $Exception;
 				}
 			} else {
-				throw new \Bol\Plaza\PlazaException('updateOffer was called without a valid offer. Expected type \Bol\Plaza\OfferUpdate');
+				throw new PlazaException('updateOffer was called without a valid offer. Expected type Bol\Plaza\Models\OfferUpdate');
 			}
 		}
 		
@@ -161,7 +159,7 @@
 		public function deleteOffer($offerId) {
 			$offerId = trim($offerId);
 			if ($offerId === '') {
-				throw new \Bol\Plaza\PlazaException('Missing offerId parameter');
+				throw new PlazaException('Missing offerId parameter');
 			}
 			$result = $this->Comms->plazaCall('/offers/v1/'.urlencode($offerId), 'DELETE');
 		}
@@ -187,7 +185,7 @@
 			if ($result['status']['http_code'] >= 200 && $result['status']['http_code'] < 300) {
 				$numMatches = preg_match('/Location: (.*)/i',$result['payload'], $matches);
 				if ($numMatches == 0) {
-					throw new \Bol\Plaza\PlazaException(
+					throw new PlazaException(
 						'No Download Location was provided by the Plaza API.',
 						null,
 						null
@@ -195,7 +193,7 @@
 				}
 				return substr($matches[1], strrpos($matches[1], '/')+1);
 			} else {
-				$Exception = new \Bol\Plaza\PlazaException(
+				$Exception = new PlazaException(
 					'An error occured while updating your offer. See the getHTTPClientStatus(), getRawBody() and getHTTPError() methods on the Exception for more details.',
 					null,
 					null
@@ -226,7 +224,7 @@
 			} else if ($result['status']['http_code'] == 412) {
 				return false;
 			} else {
-				$Exception = new \Bol\Plaza\PlazaException(
+				$Exception = new PlazaException(
 					'An error occured while creating your offer. See the getHTTPClientStatus(), getRawBody() and getHTTPError() methods on the Exception for more details.',
 					null,
 					null
@@ -250,7 +248,7 @@
 			$xmlObject -> loadXML($response['payload']);
 			
 				//Return the array representation of the xml
-			return \Bol\Plaza\API\Tools::xmlToArray($xmlObject);
+			return Tools::xmlToArray($xmlObject);
 		}
 
 
@@ -261,8 +259,7 @@
 		 * A single batch can hold up to 100 notifications.
 		 */
 		public function createNewOrderProcessingBatch() {
-			require_once dirname(__FILE__).'/Classes/ProcessOrder.class.php';
-			$this->OrderTransaction = new \Bol\Plaza\API\ProcessOrder();
+			$this->OrderTransaction = new ProcessOrder();
 			$this->OrderTransactionSize = 0;
 		}
 		
@@ -272,7 +269,7 @@
 		 */
 		public function commitProcessOrderBatch() {
 			if ($this->OrderTransactionSize < 1)
-				throw new \Bol\Plaza\PlazaException('Unable to commit empty order batch. Adding items first.');
+				throw new PlazaException('Unable to commit empty order batch. Adding items first.');
 			
 			$xml = $this->OrderTransaction->toXml();
 			$response = $this->Comms->plazaCall('/services/rest/orders/v1/process', 'POST', $xml);
@@ -281,9 +278,9 @@
 			$xmlObject -> loadXML($response['payload']);
 			
 				//XML to Array
-			$responseArray = \Bol\Plaza\API\Tools::xmlToArray($xmlObject);
+			$responseArray = Tools::xmlToArray($xmlObject);
 			
-			if ($this->debug) \Bol\Plaza\API\Tools::debug($xml, true);
+			if ($this->debug) Tools::debug($xml, true);
 			
 			if (isset($responseArray['bns:ProcessOrdersResult']['bns:ProcessOrderId'])) {
 					// Clean up
@@ -293,7 +290,7 @@
 					// Bring home the spoils of war.
 				return $responseArray['bns:ProcessOrdersResult']['bns:ProcessOrderId'];
 			}
-			else throw new \Bol\Plaza\PlazaException("Unexpected response. Expected bns:ProcessOrdersResult but received ".print_r($responseArray, true));
+			else throw new PlazaException("Unexpected response. Expected bns:ProcessOrdersResult but received ".print_r($responseArray, true));
 		}
 
 
@@ -328,7 +325,7 @@
 				$this->OrderTransaction->addShipmentToOrderProcessingBatch($a);
 				$this->OrderTransactionSize ++;
 			} else
-				throw new \Bol\Plaza\PlazaException('Invalid input. Associative array expected');
+				throw new PlazaException('Invalid input. Associative array expected');
 		}
 		
 		/**
@@ -346,13 +343,13 @@
 		 */
 		public function addCancellationToOrderProcessingBatch($a) {
 			if ($this->OrderTransactionSize > 99)
-				throw new \Bol\Plaza\PlazaException('Error while adding cancellation to batch. Too many items in batch. Max batch size is 100');
+				throw new PlazaException('Error while adding cancellation to batch. Too many items in batch. Max batch size is 100');
 			
 			if (is_array($a)) {
 				$this->OrderTransaction->addCancellationToOrderProcessingBatch($a);
 				$this->OrderTransactionSize ++;
 			} else
-				throw new \Bol\Plaza\PlazaException('Invalid input. Associative array expected');
+				throw new PlazaException('Invalid input. Associative array expected');
 		}
 		
 		/**
@@ -368,7 +365,7 @@
 		 */
 		 public function getProcessingStatus($processingId) {
 		 	if (!$processingId)
-				throw new \Bol\Plaza\PlazaException('Invalid (no) processing ID received.');
+				throw new PlazaException('Invalid (no) processing ID received.');
 			
 			$response = $this->Comms->plazaCall('/services/rest/orders/v1/process/'.$processingId, 'GET');
 				
@@ -377,7 +374,7 @@
 			$xmlObject -> loadXML($response['payload']);
 			
 				//Return the array representation of the xml
-			return \Bol\Plaza\API\Tools::xmlToArray($xmlObject);
+			return Tools::xmlToArray($xmlObject);
 		 }
 
 
@@ -389,10 +386,10 @@
 		 */
 		 public function getPaymentsForMonth($year, $month) {
 		 	if (!is_numeric($year) || $year < 1970 || $year > 2100) {
-		 		throw new \Bol\Plaza\PlazaException('Invalid Year "'.$year.'". Minimum value is 1970, maximum value is 2100');
+		 		throw new PlazaException('Invalid Year "'.$year.'". Minimum value is 1970, maximum value is 2100');
 		 	}
 			if (!is_numeric($month) || $month < 1 || $month > 12) {
-		 		throw new \Bol\Plaza\PlazaException('Invalid Month "'.$month.'". Minimum value is 1, maximum value is 12');
+		 		throw new PlazaException('Invalid Month "'.$month.'". Minimum value is 1, maximum value is 12');
 		 	}
 
 			$month = str_pad($month, 2, '0', STR_PAD_LEFT);
@@ -407,7 +404,7 @@
 			$xmlObject -> loadXML($response['payload']);
 			
 				//Return the array representation of the xml
-			return \Bol\Plaza\API\Tools::xmlToArray($xmlObject);
+			return Tools::xmlToArray($xmlObject);
 		}
 	}
 
