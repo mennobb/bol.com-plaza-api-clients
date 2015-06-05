@@ -21,10 +21,10 @@ class OfferCreate extends OfferUpdate {
 		$errorMessage = 'Invalid input while instantiating offer: ';
 
 		if (!isset($offer['EAN']))
-			throw new \PlazaException($errorMessage.'EAN not set.');	
+			throw new PlazaException($errorMessage.'EAN not set.');	
 		
 		if (!isset($offer['Condition']))
-			throw new \PlazaException($errorMessage.'Condition not set.');
+			throw new PlazaException($errorMessage.'Condition not set.');
 		
 		if (!isset($offer['QuantityInStock']))
 			$offer['QuantityInStock'] = 0;
@@ -38,7 +38,7 @@ class OfferCreate extends OfferUpdate {
 		if (is_numeric($QuantityInStock) && $QuantityInStock > -1 ) {
 			$this->QuantityInStock = $QuantityInStock;
 		} else {
-			throw new \PlazaException('Invalid QuantityInStock "'.$QuantityInStock.'"');
+			throw new PlazaException('Invalid QuantityInStock "'.$QuantityInStock.'"');
 		}
 	}
 	
@@ -47,7 +47,7 @@ class OfferCreate extends OfferUpdate {
 		if (is_numeric($EAN) && (strlen($EAN)==13 || strlen($EAN) == 10 )) {
 			$this->EAN = $EAN;
 		} else {
-			throw new \PlazaException('Invalid length for EAN/ISBN "'.$EAN.'"');
+			throw new PlazaException('Invalid length for EAN/ISBN "'.$EAN.'"');
 		}
 	}
 	
@@ -57,7 +57,7 @@ class OfferCreate extends OfferUpdate {
 		if (in_array($Condition, array('NEW','AS_NEW','GOOD','REASONABLE','MODERATE'))) {
 			$this->Condition = $Condition;				
 		} else {
-			throw new \PlazaException('Invalid Condition "'.$Condition.'"');
+			throw new PlazaException('Invalid Condition "'.$Condition.'"');
 		}
 	}
 	
@@ -67,7 +67,7 @@ class OfferCreate extends OfferUpdate {
 		if ((string)$newPrice == (string)$newPrice && $newPrice > 0) {
 			$this->Price = $newPrice;
 		} else {
-			throw new \PlazaException('Invalid Price "'.$Price.'"');
+			throw new PlazaException('Invalid Price "'.$Price.'"');
 		}
 	}
 	

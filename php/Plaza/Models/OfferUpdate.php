@@ -22,19 +22,19 @@ class OfferUpdate {
 		$errorMessage = 'Invalid input while instantiating offer: ';
 		
 		if (!is_array($offer)) 
-			throw new \PlazaException($errorMessage.'Array expected.');
+			throw new PlazaException($errorMessage.'Array expected.');
 		
 		if ($offer === false) 
-			throw new \PlazaException($errorMessage.'No $offer parameter specified.');
+			throw new PlazaException($errorMessage.'No $offer parameter specified.');
 
 		if (!isset($offer['OfferId']))
-			throw new \PlazaException($errorMessage.'OfferId not set.');
+			throw new PlazaException($errorMessage.'OfferId not set.');
 
 		if (!isset($offer['Price']))
-			throw new \PlazaException($errorMessage.'Price not set.');
+			throw new PlazaException($errorMessage.'Price not set.');
 
 		if (!isset($offer['DeliveryCode']))
-			throw new \PlazaException($errorMessage.'DeliveryCode not set.');
+			throw new PlazaException($errorMessage.'DeliveryCode not set.');
 
 		if (!isset($offer['Publish']))
 			$offer['Publish'] = true;
@@ -67,7 +67,7 @@ class OfferUpdate {
 		if (strlen($OfferId) > 0 && strlen($OfferId) < 64) {
 			$this->OfferId = $OfferId;
 		} else {
-			throw new \PlazaException('Invalid OfferId "'.$OfferId.'"');
+			throw new PlazaException('Invalid OfferId "'.$OfferId.'"');
 		}
 	}
 	
@@ -77,7 +77,7 @@ class OfferUpdate {
 		if ((string)$newPrice == (string)$newPrice && $newPrice > 0) {
 			$this->Price = $newPrice;
 		} else {
-			throw new \PlazaException('Invalid Price "'.$Price.'"');
+			throw new PlazaException('Invalid Price "'.$Price.'"');
 		}
 	}
 	
@@ -86,7 +86,7 @@ class OfferUpdate {
 		if (strlen($DeliveryCode) > 0) {
 			$this->DeliveryCode = $DeliveryCode;
 		} else {
-			throw new \PlazaException('Invalid Delivery Code "'.$DeliveryCode.'"');
+			throw new PlazaException('Invalid Delivery Code "'.$DeliveryCode.'"');
 		}
 		
 	}
@@ -102,7 +102,7 @@ class OfferUpdate {
 		if (strlen($ReferenceCode) < 21) {
 			$this->ReferenceCode = (string)$ReferenceCode;
 		} else {
-			throw new \PlazaException('Invalid ReferenceCode "'.$ReferenceCode.'"');
+			throw new PlazaException('Invalid ReferenceCode "'.$ReferenceCode.'"');
 		}
 	}
 	
@@ -111,7 +111,7 @@ class OfferUpdate {
 		if (strlen($Description) < 2000) {
 			$this->Description = (string)$Description;
 		} else {
-			throw new \PlazaException('Description too long: "'.$Description.'"');
+			throw new PlazaException('Description too long: "'.$Description.'"');
 		}
 	}
 	

@@ -16,16 +16,16 @@ class StockUpdate {
 		$errorMessage = 'Invalid input while instantiating stock update: ';
 
 		if (!is_array($offer)) 
-			throw new \PlazaException($errorMessage.'Array expected.');
+			throw new PlazaException($errorMessage.'Array expected.');
 		
 		if ($offer === false) 
-			throw new \PlazaException($errorMessage.'No $offer parameter specified.');
+			throw new PlazaException($errorMessage.'No $offer parameter specified.');
 
 		if (!isset($offer['OfferId']))
-			throw new \PlazaException($errorMessage.'OfferId not set.');
+			throw new PlazaException($errorMessage.'OfferId not set.');
 
 		if (!isset($offer['QuantityInStock']))
-			throw new \PlazaException($errorMessage.'QuantityInStock not set.');
+			throw new PlazaException($errorMessage.'QuantityInStock not set.');
 		
 		$this->SetOfferId($offer['OfferId']); 
 		$this->SetQuantityInStock($offer['QuantityInStock']);
@@ -45,7 +45,7 @@ class StockUpdate {
 		if (strlen($OfferId) > 0 && strlen($OfferId) < 65) {
 			$this->OfferId = $OfferId;
 		} else {
-			throw new \PlazaException('Invalid OfferId "'.$OfferId.'"');
+			throw new PlazaException('Invalid OfferId "'.$OfferId.'"');
 		}
 	}
 	
@@ -54,7 +54,7 @@ class StockUpdate {
 		if (is_numeric($QuantityInStock) && $QuantityInStock > -1 ) {
 			$this->QuantityInStock = $QuantityInStock;
 		} else {
-			throw new \PlazaException('Invalid QuantityInStock "'.$QuantityInStock.'"');
+			throw new PlazaException('Invalid QuantityInStock "'.$QuantityInStock.'"');
 		}
 	}
 	
