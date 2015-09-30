@@ -167,7 +167,7 @@
 		 */
 		 public function getProcessingStatus($processingId) {
 		 	if (!$processingId)
-				throw new Exception('Invalid (no) processing ID received.');
+				throw new \Exception('Invalid (no) processing ID received.');
 			
 			$responseArray = $this->Comms->plazaCall('/services/rest/orders/v1/process/'.$processingId, 'GET');
 			return $responseArray;
@@ -182,10 +182,10 @@
 		 */
 		 public function getPaymentsForMonth($year, $month) {
 		 	if (!is_numeric($year) || $year < 1970 || $year > 2100) {
-		 		throw new Exception('Invalid Year "'.$year.'". Minimum value is 1970, maximum value is 2100');
+		 		throw new \Exception('Invalid Year "'.$year.'". Minimum value is 1970, maximum value is 2100');
 		 	}
 			if (!is_numeric($month) || $month < 1 || $month > 12) {
-		 		throw new Exception('Invalid Month "'.$month.'". Minimum value is 1, maximum value is 12');
+		 		throw new \Exception('Invalid Month "'.$month.'". Minimum value is 1, maximum value is 12');
 		 	}
 
 			$month = str_pad($month, 2, '0', STR_PAD_LEFT);
