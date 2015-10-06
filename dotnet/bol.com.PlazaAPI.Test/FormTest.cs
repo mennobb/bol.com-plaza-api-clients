@@ -240,6 +240,7 @@ namespace bol.com.PlazaAPI.Test
 
             optOpenOrders.Enabled = enabled;
             optShipmentsAndCancellations.Enabled = enabled;
+            optShipmentsAndCancellationsXml.Enabled = enabled;
             optProcessOrdersOverview.Enabled = enabled;
             optPayments.Enabled = enabled;
 
