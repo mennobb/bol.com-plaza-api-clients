@@ -244,7 +244,7 @@ class API {
 			if (isset($o['bns:ProcessOrdersOverview']['bns:Order'][$orderIdx]['bns:OrderItemList']['bns:OrderItemData']['bns:OrderItemId']))
 				$o['bns:ProcessOrdersOverview']['bns:Order'][$orderIdx]['bns:OrderItemList']['bns:OrderItemData'] = Array($o['bns:ProcessOrdersOverview']['bns:Order'][$orderIdx]['bns:OrderItemList']['bns:OrderItemData']);
 
-		// Done... No "return $o;" because we operated on a var passed by reference.
+		//  Done... No "return $o;" because we operated on a var passed by reference.
 	}
 
 	/**

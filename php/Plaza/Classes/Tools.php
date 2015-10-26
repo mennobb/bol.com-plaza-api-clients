@@ -106,6 +106,7 @@
 				foreach ($arr as $key => $val)
 					$arr[$key]=is_array($val) ? '' : (string)$val;
 			return $arr;
+
 		}
 	}
 ?>

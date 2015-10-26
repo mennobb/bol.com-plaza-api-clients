@@ -6,7 +6,7 @@
 
 	class Comms {
 
-			/* API Access key as provided by Bol.com
+			/* API Access key as provided by  Bol.com
 			 * The access key is the shorter one of the two keys that you have received
 			 */
 		private $accessKey;
