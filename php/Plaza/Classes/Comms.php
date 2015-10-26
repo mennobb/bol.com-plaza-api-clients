@@ -1,16 +1,16 @@
 <?php
 
 	namespace Bol\Plaza\Classes;
-	
+
 	use Bol\Plaza\Exceptions\PlazaException;
 	use Bol\Plaza\Classes\Tools;
-	
+
 	class Comms {
 			/* API Access key as provided by Bol.com
 			 * The access key is the shorter one of the two keys that you have received
 			 */
 		private $accessKey;
-		
+
 			/* Secret key as provided by Bol.com
 			 * The secret key is the longer one of the two keys that you have received
 			 */
@@ -27,17 +27,17 @@
 			)
 		);
 		private	$currentEnv = 'production';
-		
+
 		public $enableResponseHeaders = false;
-		
+
 		/**
 		 * @param debug {Boolean} Whether or not to print debug information.
 		 */
 		private $debug;
-		
-		
+
+
 		private $responseToFile = false;
-		
+
 		public function __construct($parent, $accessKey, $secretKey, $targetTestEnv) {
 			$this->debug = $parent->debug ? true : false;
 
@@ -47,7 +47,7 @@
 			} else {
 				throw new PlazaException('Invalid accessKey / secretKey pair provided.');
 			}
-			
+
 				// Should we target the testing environment?
 			if ($targetTestEnv === true)
 				$this->currentEnv = 'testing';
@@ -55,11 +55,11 @@
 
 		/** Public method to perform a call to the API */
 		public function plazaCall($targetUri, $httpMethod = 'POST', $xmlPayLoad = false, $mimeType = 'application/xml') {
-			
+
 				// Perform the call
 			$callResult = $this -> _compileAndPerformHTTPCall($targetUri, $httpMethod, $xmlPayLoad, $mimeType);
-			
-				// Print debug info and return 
+
+				// Print debug info and return
 			if ($this -> debug) Tools::debug($callResult, true); // @TODO: Checken of dit wel goed werkt.
 
 
@@ -73,30 +73,30 @@
 		*/
 		private function _compileAuthHeader($targetUri, $date, $httpMethod, $mimeType = 'application/xml') {
 			$httpMethod = strtoupper($httpMethod);
-			
+
 			if (!in_array($httpMethod, Array('PUT','POST','DELETE','GET', 'HEAD'))) {
-				throw new PlazaException('Invalid HTTP Method "'.$httpMethod.'"');  
+				throw new PlazaException('Invalid HTTP Method "'.$httpMethod.'"');
 			}
-			
+
 			if (strpos($targetUri, '?') !== false) {
 				$targetUri = substr($targetUri, 0, strpos($targetUri, '?'));
 			}
-			
+
 			$signatureElements = Array();
 			$signatureElements[] = $httpMethod."\n"; // Extra newline
-			$signatureElements[] = $mimeType; 
+			$signatureElements[] = $mimeType;
 			$signatureElements[] = $date;
 			$signatureElements[] = "x-bol-date:".$date;
 			$signatureElements[] = $targetUri;
-			
+
 			$signatureString = implode("\n", $signatureElements);
 
 			$signature = $this->accessKey.':';
 			$signature.= base64_encode(
 							hash_hmac(
-								'SHA256', 
-								$signatureString, 
-								$this->secretKey, 
+								'SHA256',
+								$signatureString,
+								$this->secretKey,
 								true
 							)
 						);
@@ -113,21 +113,21 @@
 			$ErrorCode = 'Bol Error Code unavailable';
 			$ErrorMsg = 'Errormessage unavailable';
 
-				// Extract error messages and codes from the server response IF ANY XML was returned at all. 
+				// Extract error messages and codes from the server response IF ANY XML was returned at all.
 			if (strlen(trim($curlResults['payload']))>0) {
 				$xmlError = new \DOMDocument();
 				if (@$xmlError -> loadXML($curlResults['payload']) !== false) {
 					$ErrorCode = @$xmlError->getElementsByTagNameNS('http://config.services.bol.com/schemas/serviceerror-1.5.xsd', 'errorCode');
 					$ErrorCode = @$ErrorCode->item(0)->nodeValue;
-					
+
 					$ErrorMsg = @$xmlError->getElementsByTagNameNS('http://config.services.bol.com/schemas/serviceerror-1.5.xsd', 'errorMessage');
-					$ErrorMsg = @$ErrorMsg->item(0)->nodeValue;				
+					$ErrorMsg = @$ErrorMsg->item(0)->nodeValue;
 				}
 			}
-			
+
 			if (isset($curlResults['status']['http_code'])) {
 				$ErrorHTTPCode = 'HTTP1/1 '.$curlResults['status']['http_code'];
-				
+
 				switch ($curlResults['status']['http_code']) {
 					case '401':
 						$ErrorMsg = 'Unauthorized';
@@ -165,34 +165,34 @@
 			$Exception -> setHTTPError($curlResults['error']);
 			throw $Exception;
 		}
-		
-		
+
+
 		/**
 		 * Perform an API call.
-		 * @param targetUri - The URI (Not a complete URL) the call should be placed to. 
-		 * @param $httpMethod - GET or POST 
-		 * @param $xmlPayLoad - String containing the XML to be sent. 
+		 * @param targetUri - The URI (Not a complete URL) the call should be placed to.
+		 * @param $httpMethod - GET or POST
+		 * @param $xmlPayLoad - String containing the XML to be sent.
 		 * @param $mimeType - Typically application/xml;
-		 * 
+		 *
 		 * @return Array with 3 keys: playload, status and error
-		 * 
-		 * @Throws Exception 
+		 *
+		 * @Throws Exception
 		 */
 		private function _compileAndPerformHTTPCall($targetUri, $httpMethod, $xmlPayLoad, $mimeType) {
 			/*	@TODO: Add ontent filtering.
 			Check if there's a / at the beginning of the Uri for example.
 			Check if the xml seems valid */
-			
-			
+
+
 				// Set the date variable here to ensure the same date is used in the x-bol-authorization header and the x-bol-date header
 			$date = gmdate('D, d M Y H:i:s T');
-				
+
 				// Get authenticaction header
 			$headerXBolAuth = $this->_compileAuthHeader($targetUri, $date, $httpMethod, $mimeType);
-			
+
 			$HTTPHeaders = Array(
-				"Content-type: ".$mimeType, 
-				"X-BOL-Date: ".$date, 
+				"Content-type: ".$mimeType,
+				"X-BOL-Date: ".$date,
 				"X-BOL-Authorization: ".$headerXBolAuth
 			);
 
@@ -226,14 +226,11 @@
 					throw new PlazaException('Unable to open location "'.$this->responseToFile.'" for writing');
 				}
 			}
-			
-			/*
-			 * Enabling the following is NOT recommended but could serve if there's trouble with the SSL certificate.
-			 * This has happened in the past but should not happen again. (Shoulda Coulda Woulda)
-			 * */ 
-			 curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
-			 curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
-			 
+
+			// TODO Enabling the following is recommended but has been know to fail in the past.
+			curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
+			curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
+
 				// Execute the call
 			$curlPayload = curl_exec($curl);
 			$curlStatus = curl_getinfo($curl);
@@ -244,14 +241,14 @@
 
 				// Disable the "write to file" option.
 			$this->responseToFile(false);
-			
-			
+
+
 			$curlResults = array(
-				'payload'	=>$curlPayload,	// Contains the HTTP Body 
+				'payload'	=>$curlPayload,	// Contains the HTTP Body
 				'status'	=>$curlStatus,	// Contains the curl status
 				'error'		=>$curlError	// Contains cURL's error message (if any)
 			);
-			
+
 				// Handle the response
 			if (!$curlStatus['http_code'] || $curlStatus['http_code'] < 200 || $curlStatus['http_code'] > 299) {
 					// If the server returned an error, fail screaming like a pig....yet in a graceful manner ;)
@@ -264,7 +261,7 @@
 		}
 
 		/**
-		 * Configures the HTTP client to store the HTTP response to disk. 
+		 * Configures the HTTP client to store the HTTP response to disk.
 		 * After executing the call and storing it, this setting will be disabled again automatically!
 		 * @param $fileName String specifying the complete path to the file that should be saved or false to disable this feature
 		 */
@@ -274,7 +271,7 @@
 			} else if (!file_exists(dirname($fileName)) || !is_writable(dirname($fileName))) {
 				throw new PlazaException('Unable to open location "'.$fileName.'" for writing');
 			}
-			
+
 			$this->responseToFile = $fileName;
 		}
 	}
