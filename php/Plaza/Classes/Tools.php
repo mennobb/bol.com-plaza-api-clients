@@ -1,7 +1,7 @@
 <?php
 
 	namespace Bol\Plaza\Classes;
-	
+
 	class Tools {
 
 			/**
@@ -44,7 +44,7 @@
 
 			return $result;
 		}
-		
+
 		public static function debug($data, $isXml = false) {
 			$trace  = debug_backtrace();
 			$caller = array_shift($trace);
@@ -54,7 +54,7 @@
 			} else {
 				echo "Called by {$caller['function']}";
 			}
-			
+
 			if ($isXml) {
 				$dom = new \DOMDocument;
 				$dom->preserveWhiteSpace = false;
@@ -67,7 +67,7 @@
 				echo "\n\n<br/><br/>";
 			}
 		}
-		
+
 		public static function getGMTDateTime() {
 				$date = new \DateTime();
 				$date->setTimezone(new \DateTimeZone('Etc/Greenwich'));
@@ -80,13 +80,13 @@
 				if (is_array($nodeValue) && !isset($nodeValue[0])) {
 						// Associative, let's go deeper.........inception....
 					$xml .= str_repeat("\t", $level);
-					$xml .= '<'.$nodeName.">\n"; 
+					$xml .= '<'.$nodeName.">\n";
 					$xml .= self::arrayToXML($nodeValue, $level+1);
 					$xml .= str_repeat("\t", $level);
 					$xml .= '</'.$nodeName.">\n";
 				} elseif (is_array($nodeValue) && isset($nodeValue[0])) {
 						// Probably numeric.
-					$indentation = str_repeat("\t", $level);  
+					$indentation = str_repeat("\t", $level);
 					foreach ($nodeValue as $item) {
 						$xml .= $indentation . '<'.$nodeName.'>' . $item . '</'.$nodeName.">\n";
 					}
@@ -97,8 +97,16 @@
 					$xml .= '</'.$nodeName.">\n";
 				}
 			}
-			
+
 			return $xml;
+		}
+
+		public static function replaceEmptyArraysWithEmptyStrings($arr) {
+			if (is_array($arr))
+				foreach ($arr as $key => $val)
+					$arr[$key]=is_array($val) ? '' : (string)$val;
+			return $arr;
+
 		}
 	}
 ?>
