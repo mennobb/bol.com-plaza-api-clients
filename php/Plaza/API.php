@@ -419,6 +419,10 @@ class API {
 	 * This method hardly uses extra memory and is quite fast.
 	 */
 	private function fixOpenOrdersResponse(&$o) {
+		// First see if there's something to be done.
+		if (count($o['bns:OpenOrders'])<1)
+			return;
+
 		// Allow iterating over an order stream that only has 1 order.
 		if (isset($o['bns:OpenOrders']['bns:OpenOrder']['bns:OrderId']))
 			$o['bns:OpenOrders']['bns:OpenOrder'] = Array($o['bns:OpenOrders']['bns:OpenOrder']);
@@ -432,7 +436,7 @@ class API {
 		// They occur when the original XML contained something like <deliveryPeriod></deliveryPeriod>
 		foreach ($o['bns:OpenOrders']['bns:OpenOrder'] as $key => $singleOrder)
 			foreach ($o['bns:OpenOrders']['bns:OpenOrder'][$key]['bns:OpenOrderItems']['bns:OpenOrderItem'] as $ooKey => $singleOrderedItem)
-				$o['bns:OpenOrders']['bns:OpenOrder'][$key]['bns:OpenOrderItems']['bns:OpenOrderItem'][$ooKey] = \Bol\Plaza\Classes\Tools::replaceEmptyArraysWithEmptyStrings($singleOrderedItem);
+				$o['bns:OpenOrders']['bns:OpenOrder'][$key]['bns:OpenOrderItems']['bns:OpenOrderItem'][$ooKey] = Tools::replaceEmptyArraysWithEmptyStrings($singleOrderedItem);
 
 		// Replace missing values or values of type "array" in the address details
 		$allFields = array('bns:SalutationCode', 'bns:FirstName', 'bns:Surname', 'bns:Streetname', 'bns:Housenumber', 'bns:HousenumberExtended', 'bns:AddressSupplement', 'bns:ZipCode', 'bns:City', 'bns:CountryCode', 'bns:Email', 'bns:Telephone', 'bns:Company');
@@ -455,6 +459,10 @@ class API {
 	}
 
 	private function fixProcessingStatusResponse(&$o) {
+		// First see if there's something to be done.
+		if (count($o['bns:ProcessOrdersOverview'])<1)
+			return;
+
 		if (isset($o['bns:ProcessOrdersOverview']['bns:Order']['bns:OrderId']))
 			$o['bns:ProcessOrdersOverview']['bns:Order'] = array($o['bns:ProcessOrdersOverview']['bns:Order']);
 
@@ -470,17 +478,21 @@ class API {
 	 * Now it doesn't check for missing fields or fields whose empty value was turned into an array instead of an empty string.
 	 */
 	private function fixPaymentsForMonthResponse(&$o) {
+		// First see if there's something to be done.
+		if (count($o['bns:Payments'])<1)
+			return;
+
 		// Allow iterating over a payment stream that only has 1 payment.
-		if (isset($o['bns:Payments']['Payment']['bns:CreditInvoiceNumber']))
-			$o['bns:Payments']['Payment'] = array($o['bns:Payments']['Payment']);
+		if (isset($o['bns:Payments']['bns:Payment']['bns:CreditInvoiceNumber']))
+			$o['bns:Payments']['bns:Payment'] = array($o['bns:Payments']['bns:Payment']);
 
-		foreach ($o['bns:Payments']['Payment'] as $paymentIdx => $payment)
-			if (isset($o['bns:Payments']['Payment'][$paymentIdx]['PaymentShipments']['PackageSlipNumber']))
-				$o['bns:Payments']['Payment'][$paymentIdx]['PaymentShipments'] = array($o['bns:Payments']['Payment'][$paymentIdx]['PaymentShipments']);
+		foreach ($o['bns:Payments']['bns:Payment'] as $paymentIdx => $payment)
+			if (isset($o['bns:Payments']['bns:Payment'][$paymentIdx]['bns:PaymentShipments']['bns:PackageSlipNumber']))
+				$o['bns:Payments']['bns:Payment'][$paymentIdx]['bns:PaymentShipments'] = array($o['bns:Payments']['bns:Payment'][$paymentIdx]['bns:PaymentShipments']);
 
-		foreach ($o['bns:Payments']['Payment'][$paymentIdx]['PaymentShipments'] as $paymentShipmentIdx => $paymentShipment)
-			if (isset($o['bns:Payments']['Payment'][$paymentIdx]['PaymentShipments'][$paymentShipmentIdx]['PaymentShipmentItems']['PaymentShipmentItem']['OrderItemId']))
-				$o['bns:Payments']['Payment'][$paymentIdx]['PaymentShipments'][$paymentShipmentIdx]['PaymentShipmentItems']['PaymentShipmentItem'] = array($o['bns:Payments']['Payment'][$paymentIdx]['PaymentShipments'][$paymentShipmentIdx]['PaymentShipmentItems']['PaymentShipmentItem']);
+		foreach ($o['bns:Payments']['bns:Payment'][$paymentIdx]['bns:PaymentShipments'] as $paymentShipmentIdx => $paymentShipment)
+			if (isset($o['bns:Payments']['bns:Payment'][$paymentIdx]['bns:PaymentShipments'][$paymentShipmentIdx]['bns:PaymentShipmentItems']['bns:PaymentShipmentItem']['bns:OrderItemId']))
+				$o['bns:Payments']['bns:Payment'][$paymentIdx]['bns:PaymentShipments'][$paymentShipmentIdx]['bns:PaymentShipmentItems']['bns:PaymentShipmentItem'] = array($o['bns:Payments']['bns:Payment'][$paymentIdx]['bns:PaymentShipments'][$paymentShipmentIdx]['bns:PaymentShipmentItems']['bns:PaymentShipmentItem']);
 
 		// Done... No "return $o;" because we operated on a var passed by reference.
 	}
