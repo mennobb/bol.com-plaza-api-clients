@@ -249,15 +249,8 @@
 				'error'		=>$curlError	// Contains cURL's error message (if any)
 			);
 
-				// Handle the response
-			if (!$curlStatus['http_code'] || $curlStatus['http_code'] < 200 || $curlStatus['http_code'] > 299) {
-					// If the server returned an error, fail screaming like a pig....yet in a graceful manner ;)
-					// @TODO: This is not ideal as it can't be controlled. This should be rewritten to become something optional or something...
-				$this->_handleError($curlResults, $HTTPHeaders);
-			} else {
-					// Return the results to the caller.
-				return $curlResults;
-			}
+				// Return the results to the caller.
+			return $curlResults;
 		}
 
 		/**
