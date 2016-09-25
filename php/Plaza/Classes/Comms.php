@@ -60,7 +60,7 @@
 			$callResult = $this -> _compileAndPerformHTTPCall($targetUri, $httpMethod, $xmlPayLoad, $mimeType);
 
 				// Print debug info and return
-			if ($this -> debug) Tools::debug($callResult, true); // @TODO: Checken of dit wel goed werkt.
+			if ($this -> debug) Tools::debug($callResult['payload'], true); 
 
 
 				// Return the entire call result object.
