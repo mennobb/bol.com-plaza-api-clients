@@ -13,7 +13,7 @@ Currently the only features disclosed through the API are:
 - Marking orders as shipped or cancelled
 - Getting payment information
 
-For more information see the bol.com [developer portal](http://dev-local.developers.bol.com/ "Developer Portal") (Only available in the Dutch language although the documentation is in English).
+For more information see the bol.com [developer portal](http://developers.bol.com/ "Developer Portal") (Only available in the Dutch language although the documentation is in English).
 
 Target Audience
 ===============
